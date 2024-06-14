@@ -65,9 +65,26 @@ theorem classification_aux : ∀ (ρ : Weight 0),
 def ofComplex (z : ℂ) {n : ℕ} (ρ : Weight n) (hρ : ρ.IsTrivial) :
     AutomorphicFormForGLnOverQ n ρ where
       toFun _ := z
-      is_smooth := sorry
-      is_periodic := sorry
-      is_slowly_increasing := sorry
+      is_smooth := by
+        constructor
+        · continuity
+        · exact fun _ ↦ IsLocallyConstant.of_constant _ fun _ _ ↦ rfl
+        · intro
+          apply (config := { allowSynthFailures := true }) smooth_const
+          -- `exact smooth_const` doesn't work:
+          /-
+          failed to synthesize instance
+            NormedAddCommGroup (Matrix (Fin n) (Fin n) ℝ)
+          -/
+      is_periodic _ _ _ := rfl
+      is_slowly_increasing _ := by
+        constructor
+        refine ⟨Complex.abs z, 1, ?_⟩
+        intro M
+        simp only [Complex.norm_eq_abs, pow_one]
+        conv_lhs => rw [← mul_one (Complex.abs z)]
+        gcongr
+        sorry -- we need to use `hρ` which is undefined.
       is_finite_cod := sorry -- needs a better name
       has_finite_level := sorry -- needs a better name
 
@@ -75,8 +92,14 @@ def ofComplex (z : ℂ) {n : ℕ} (ρ : Weight n) (hρ : ρ.IsTrivial) :
 noncomputable def classification (ρ : Weight 0) : AutomorphicFormForGLnOverQ 0 ρ ≃ ℂ where
   toFun f := f 1
   invFun z := ofComplex z ρ sorry
-  left_inv := sorry
-  right_inv := sorry
+  left_inv x := by
+    simp [ofComplex]
+    apply AutomorphicFormForGLnOverQ.ext
+    ext y
+    simp
+    apply congrArg
+    apply Subsingleton.elim
+  right_inv x := rfl
 
 -- Can this be beefed up to an isomorphism of complex
 -- vector spaces?

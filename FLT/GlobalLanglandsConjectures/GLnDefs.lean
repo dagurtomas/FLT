@@ -312,6 +312,13 @@ structure AutomorphicFormForGLnOverQ (n : ℕ) (ρ : Weight n) where
       ⟨fun y ↦ toFun (x, y), is_smooth.smooth x⟩)
   -- missing: infinite part has a weight
 
+lemma AutomorphicFormForGLnOverQ.ext (n : ℕ) (ρ : Weight n)
+    (a b : AutomorphicFormForGLnOverQ n ρ) (h : a.1 = b.1) : a = b := by
+  cases a
+  cases b
+  subst h
+  rfl
+
 namespace AutomorphicFormForGLnOverQ
 
 -- not entirely sure what I'm doing here. Is it as simple as this?
